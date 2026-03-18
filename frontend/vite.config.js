@@ -34,5 +34,12 @@ export default defineConfig({
   preview: {
     port: 4173,
     host: true,
+  },
+
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.js'],
+    css: true
   }
 })

@@ -1,6 +1,7 @@
 package com.main.tutorly.config;
 
 import com.main.tutorly.security.JwtRequestFilter;
+import com.main.tutorly.security.RateLimitFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +31,9 @@ public class SecurityConfig {
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
     
+    @Autowired
+    private RateLimitFilter rateLimitFilter;
+    
     @Value("${cors.allowed-origins}")
     private String allowedOrigins;
     
@@ -44,12 +48,15 @@ public class SecurityConfig {
                 .requestMatchers("/api/tutors/**").permitAll()
                 .requestMatchers("/api/subjects/**").permitAll()
                 .requestMatchers("/api/reviews/tutor/**").permitAll()
+                .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers("/actuator/info").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
+            .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();
