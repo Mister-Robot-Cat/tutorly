@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { tutorAPI, subjectAPI } from '../services/api'
 import { Search, Filter, Star, DollarSign, BookOpen } from 'lucide-react'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 const Tutors = () => {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -158,9 +159,7 @@ const Tutors = () => {
           {/* Tutors Grid */}
           <div className="lg:col-span-3">
             {loading ? (
-              <div className="flex items-center justify-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-              </div>
+              <LoadingSpinner message="Finding the best tutors for you..." size="large" />
             ) : tutors.length === 0 ? (
               <div className="text-center py-12">
                 <Search className="h-16 w-16 text-gray-400 mx-auto mb-4" />
