@@ -32,6 +32,8 @@ export const authAPI = {
 
 export const tutorAPI = {
   getAll: (params) => api.get('/tutors', { params }),
+  getPaged: (page = 0, size = 10, sortBy = 'rating') => 
+    api.get('/tutors/paged', { params: { page, size, sortBy } }),
   getById: (id) => api.get(`/tutors/${id}`),
   updateProfile: (data) => api.put('/tutors/profile', data),
 }
