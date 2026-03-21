@@ -2,7 +2,6 @@ package com.main.tutorly.controller;
 
 import com.main.tutorly.dto.BookingRequest;
 import com.main.tutorly.entity.Booking;
-import com.main.tutorly.exception.ResourceNotFoundException;
 import com.main.tutorly.service.AuthService;
 import com.main.tutorly.service.BookingService;
 import jakarta.validation.Valid;
