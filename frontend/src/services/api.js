@@ -1,4 +1,9 @@
 import axios from 'axios'
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
+
+// Configure NProgress
+NProgress.configure({ showSpinner: false, speed: 400 })
 
 // Use environment variable for API URL, fallback to localhost for development
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
@@ -13,6 +18,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
+    NProgress.start()
     const token = localStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
@@ -20,6 +26,18 @@ api.interceptors.request.use(
     return config
   },
   (error) => {
+    NProgress.done()
+    return Promise.reject(error)
+  }
+)
+
+api.interceptors.response.use(
+  (response) => {
+    NProgress.done()
+    return response
+  },
+  (error) => {
+    NProgress.done()
     return Promise.reject(error)
   }
 )
