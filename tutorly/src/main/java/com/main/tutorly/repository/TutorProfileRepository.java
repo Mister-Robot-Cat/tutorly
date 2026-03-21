@@ -1,6 +1,8 @@
 package com.main.tutorly.repository;
 
 import com.main.tutorly.entity.TutorProfile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,6 +18,9 @@ public interface TutorProfileRepository extends JpaRepository<TutorProfile, Long
     
     @Query("SELECT t FROM TutorProfile t WHERE t.user.isActive = true")
     List<TutorProfile> findAllActiveTutors();
+    
+    @Query("SELECT t FROM TutorProfile t WHERE t.user.isActive = true")
+    Page<TutorProfile> findAllActiveTutors(Pageable pageable);
     
     @Query("SELECT t FROM TutorProfile t JOIN t.subjects s WHERE s.name = :subjectName AND t.user.isActive = true")
     List<TutorProfile> findBySubjectName(@Param("subjectName") String subjectName);
