@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { GraduationCap, Mail, Lock, User, DollarSign, FileText, AlertCircle } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -33,9 +34,12 @@ const Register = () => {
         data.hourlyRate = parseFloat(formData.hourlyRate) || 25
       }
       await register(data)
+      toast.success('Successfully registered!')
       navigate('/')
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed')
+      const errorMessage = err.response?.data?.message || 'Registration failed'
+      setError(errorMessage)
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }
