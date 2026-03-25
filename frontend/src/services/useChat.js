@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 
 // Helper to get WS URL from standard API URL
 const getWsUrl = () => {
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8081/api'
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
     return apiUrl.replace('/api', '/ws')
 }
 

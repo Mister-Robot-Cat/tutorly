@@ -46,7 +46,7 @@ public class BookingService {
         
         BigDecimal totalPrice = tutor.getHourlyRate()
                 .multiply(BigDecimal.valueOf(request.getDurationMinutes()))
-                .divide(BigDecimal.valueOf(60), 2, BigDecimal.ROUND_HALF_UP);
+                .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
         
         Booking booking = new Booking();
         booking.setStudent(student);
