@@ -10,6 +10,7 @@ import Tutors from './pages/Tutors'
 import TutorDetail from './pages/TutorDetail'
 import StudentDashboard from './pages/StudentDashboard'
 import AdminDashboard from './pages/AdminDashboard'
+import Inbox from './pages/Inbox'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
@@ -45,6 +46,14 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/tutors" element={<Tutors />} />
               <Route path="/tutors/:id" element={<TutorDetail />} />
+              <Route 
+                path="/inbox" 
+                element={
+                  <ProtectedRoute>
+                    <Inbox />
+                  </ProtectedRoute>
+                } 
+              />
               <Route 
                 path="/dashboard/student" 
                 element={

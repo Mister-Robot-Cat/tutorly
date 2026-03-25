@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
-import { GraduationCap, Moon, Sun, User, LogOut, LayoutDashboard } from 'lucide-react'
+import { GraduationCap, Moon, Sun, User, LogOut, LayoutDashboard, MessageSquare } from 'lucide-react'
 
 const Navbar = () => {
   const { user, logout } = useAuth()
@@ -52,6 +52,14 @@ const Navbar = () => {
                 <span className="text-sm text-gray-700 dark:text-gray-300">
                   {user.firstName} {user.lastName}
                 </span>
+
+                <Link
+                  to="/inbox"
+                  className="flex items-center space-x-1 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400"
+                >
+                  <MessageSquare className="h-5 w-5" />
+                  <span className="text-sm font-medium">Messages</span>
+                </Link>
                 
                 {user.role === 'STUDENT' && (
                   <Link

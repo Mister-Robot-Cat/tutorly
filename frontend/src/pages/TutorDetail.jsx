@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { tutorAPI, reviewAPI, bookingAPI } from '../services/api'
+import api from '../services/api' // import general api for chat
 import { useAuth } from '../context/AuthContext'
-import { Star, DollarSign, BookOpen, Award, Calendar, Clock, X } from 'lucide-react'
+import { Star, DollarSign, BookOpen, Award, Calendar, Clock, X, MessageSquare } from 'lucide-react'
 import { format } from 'date-fns'
 
 const TutorDetail = () => {
@@ -12,6 +13,7 @@ const TutorDetail = () => {
   const [tutor, setTutor] = useState(null)
   const [reviews, setReviews] = useState([])
   const [loading, setLoading] = useState(true)
+  const [messageLoading, setMessageLoading] = useState(false)
   const [showBookingModal, setShowBookingModal] = useState(false)
   const [bookingData, setBookingData] = useState({
     subjectId: '',
@@ -66,6 +68,26 @@ const TutorDetail = () => {
       navigate('/dashboard/student')
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to create booking')
+    }
+  }
+
+  const handleMessageTutor = async () => {
+    if (!user) {
+      navigate('/login')
+      return
+    }
+    
+    setMessageLoading(true)
+    try {
+      // Endpoint expects the target user's ID, which is tutor.user.id
+      const response = await api.post('/chat/rooms', { recipientId: tutor.user.id })
+      // Navigate to inbox which will show the room
+      navigate('/inbox')
+    } catch (error) {
+      console.error('Failed to create/get chat room', error)
+      alert('Could not start chat. Please try again later.')
+    } finally {
+      setMessageLoading(false)
     }
   }
 
@@ -131,17 +153,27 @@ const TutorDetail = () => {
                 ))}
               </div>
             </div>
-            <div className="text-center md:text-right">
+            <div className="text-center md:text-right flex flex-col gap-3">
               <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
                 ${tutor.hourlyRate}
                 <span className="text-lg text-gray-500 dark:text-gray-400">/hr</span>
               </div>
               <button
                 onClick={() => setShowBookingModal(true)}
-                className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-lg"
+                className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-lg w-full"
               >
                 Book a Lesson
               </button>
+              {user?.id !== tutor.user.id && (
+                <button
+                  onClick={handleMessageTutor}
+                  disabled={messageLoading}
+                  className="flex items-center justify-center gap-2 bg-white dark:bg-gray-700 border-2 border-primary-600 text-primary-600 dark:text-primary-400 px-6 py-3 rounded-lg font-semibold hover:bg-primary-50 dark:hover:bg-gray-600 transition-colors w-full disabled:opacity-50"
+                >
+                  <MessageSquare className="h-5 w-5" />
+                  {messageLoading ? 'Loading...' : 'Message Tutor'}
+                </button>
+              )}
             </div>
           </div>
         </div>
