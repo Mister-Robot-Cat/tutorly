@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { tutorAPI, reviewAPI, bookingAPI } from '../services/api'
-import api from '../services/api' // import general api for chat
+import api, { tutorAPI, reviewAPI, bookingAPI } from '../services/api'
 import { useAuth } from '../context/AuthContext'
 import { Star, DollarSign, BookOpen, Award, Calendar, Clock, X, MessageSquare } from 'lucide-react'
 import { format } from 'date-fns'
@@ -80,7 +79,7 @@ const TutorDetail = () => {
     setMessageLoading(true)
     try {
       // Endpoint expects the target user's ID, which is tutor.user.id
-      const response = await api.post('/chat/rooms', { recipientId: tutor.user.id })
+      await api.post('/chat/rooms', { recipientId: tutor.user.id })
       // Navigate to inbox which will show the room
       navigate('/inbox')
     } catch (error) {

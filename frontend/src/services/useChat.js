@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Client } from '@stomp/stompjs'
-import SockJS from 'sockjs-client'
 import api from './api'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
@@ -47,44 +46,61 @@ export const useChat = (roomId) => {
     useEffect(() => {
         if (!user || !roomId) return
 
-        const token = localStorage.getItem('token')
-        const client = new Client({
-            webSocketFactory: () => new SockJS(getWsUrl()),
-            connectHeaders: {
-                Authorization: `Bearer ${token}`
-            },
-            debug: (str) => {
-                // console.log(str) // Uncomment for debug
-            },
-            reconnectDelay: 5000,
-            heartbeatIncoming: 4000,
-            heartbeatOutgoing: 4000,
-        })
+        let client = null
+        let cancelled = false
 
-        client.onConnect = () => {
-            setIsConnected(true)
-            client.subscribe(`/topic/room/${roomId}`, (message) => {
-                if (message.body) {
-                    const newMessage = JSON.parse(message.body)
-                    setMessages(prev => {
-                        // Prevent duplicates
-                        if (prev.some(m => m.id === newMessage.id)) return prev
-                        return [...prev, newMessage]
+        const initializeChat = async () => {
+            try {
+                if (typeof global === 'undefined') {
+                    window.global = window
+                }
+
+                const { default: SockJS } = await import('sockjs-client')
+                if (cancelled) return
+
+                const token = localStorage.getItem('token')
+                client = new Client({
+                    webSocketFactory: () => new SockJS(getWsUrl()),
+                    connectHeaders: {
+                        Authorization: `Bearer ${token}`
+                    },
+                    debug: () => {},
+                    reconnectDelay: 5000,
+                    heartbeatIncoming: 4000,
+                    heartbeatOutgoing: 4000,
+                })
+
+                client.onConnect = () => {
+                    setIsConnected(true)
+                    client.subscribe(`/topic/room/${roomId}`, (message) => {
+                        if (message.body) {
+                            const newMessage = JSON.parse(message.body)
+                            setMessages(prev => {
+                                if (prev.some(m => m.id === newMessage.id)) return prev
+                                return [...prev, newMessage]
+                            })
+                        }
                     })
                 }
-            })
+
+                client.onStompError = (frame) => {
+                    console.error('Broker reported error: ' + frame.headers['message'])
+                    console.error('Additional details: ' + frame.body)
+                }
+
+                client.activate()
+                setStompClient(client)
+            } catch (error) {
+                console.error('Failed to initialize chat connection', error)
+            }
         }
 
-        client.onStompError = (frame) => {
-            console.error('Broker reported error: ' + frame.headers['message'])
-            console.error('Additional details: ' + frame.body)
-        }
-
-        client.activate()
-        setStompClient(client)
+        initializeChat()
 
         return () => {
-            if (client.active) {
+            cancelled = true
+            setIsConnected(false)
+            if (client?.active) {
                 client.deactivate()
             }
         }
